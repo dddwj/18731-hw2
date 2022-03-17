@@ -66,18 +66,18 @@ class DumbbellTopo(Topo):
         hl1 = self.addHost('hl1')
         hl2 = self.addHost('hl2')
         a1 = self.addHost('a1')
-        self.addLink(hl1, s1, bw=bw_host, delay=delay)
-        self.addLink(hl2, s1, bw=bw_host, delay=delay)
-        self.addLink(a1, s1, bw=bw_host, delay=delay)
+        self.addLink(hl1, s1, bw=bw_host, delay=delay, max_queue_size=maxq)
+        self.addLink(hl2, s1, bw=bw_host, delay=delay, max_queue_size=maxq)
+        self.addLink(a1, s1, bw=bw_host, delay=delay, max_queue_size=maxq)
 
         hr1 = self.addHost('hr1')
         hr2 = self.addHost('hr2')
         a2 = self.addHost('a2')
-        self.addLink(hr1, s2, bw=bw_host, delay=delay)
-        self.addLink(hr2, s2, bw=bw_host, delay=delay)
-        self.addLink(a2, s2, bw=bw_host, delay=delay)
+        self.addLink(hr1, s2, bw=bw_host, delay=delay, max_queue_size=maxq)
+        self.addLink(hr2, s2, bw=bw_host, delay=delay, max_queue_size=maxq)
+        self.addLink(a2, s2, bw=bw_host, delay=delay, max_queue_size=maxq)
 
-        self.addLink(s1, s2, bw=bw_net, delay=delay)
+        self.addLink(s1, s2, bw=bw_net, delay=delay, max_queue_size=maxq)
 
 
 def bbnet():
