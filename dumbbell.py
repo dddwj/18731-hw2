@@ -58,30 +58,71 @@ args = parser.parse_args()
 
 class DumbbellTopo(Topo):
     "Dumbbell topology for Shrew experiment"
-    def build(self, n=6, bw_net=10, delay='20ms', bw_host=10, maxq=None):
-    #TODO: Add your code to create topology
+    def build(self, n=6, bw_net=100, delay='20ms', bw_host=10, maxq=None):
+        # Add your code to create topology
+        s1 = self.addSwitch('s1')
+        s2 = self.addSwitch('s2')
 
-		
-	
+        hl1 = self.addHost('hl1')
+        hl2 = self.addHost('hl2')
+        a1 = self.addHost('a1')
+        self.addLink(hl1, s1, bw=bw_host, delay=delay)
+        self.addLink(hl2, s1, bw=bw_host, delay=delay)
+        self.addLink(a1, s1, bw=bw_host, delay=delay)
+
+        hr1 = self.addHost('hr1')
+        hr2 = self.addHost('hr2')
+        a2 = self.addHost('a2')
+        self.addLink(hr1, s2, bw=bw_host, delay=delay)
+        self.addLink(hr2, s2, bw=bw_host, delay=delay)
+        self.addLink(a2, s2, bw=bw_host, delay=delay)
+
+        self.addLink(s1, s2, bw=bw_net, delay=delay)
+
+
 def bbnet():
-    "Create network and run shrew  experiment"
+    "Create network and run shrew experiment"
     print "starting mininet ...."
+    print args
     topo = DumbbellTopo(n=args.n, bw_net=args.bw_net,
                     delay='%sms' % (args.delay),
                     bw_host=args.bw_host, maxq=int(args.maxq))
 
-    net = Mininet(topo=topo, host=CPULimitedHost, link=TCLink,
-                  autoPinCpus=True)
+    net = Mininet(topo=topo, host=CPULimitedHost, link=TCLink, autoPinCpus=True)
     net.start()
     dumpNodeConnections(net.hosts)
 
-    #TODO: Add your code to test reachability of hosts
+    # Add your code to test reachability of hosts
+    "Testing reachability of hosts - pingall"
+    net.pingAll()
 
-    #TODO: Add yoour code to start long lived TCP flows 
-  
+    # Add your code to start long lived TCP flows 
+    hl1, hl2, hr1, hr2 = net.get('hl1','hl2','hr1','hr2')
+    hl1_ip = hl1.IP()
+    hl2_ip = hl2.IP()
+    hr1_ip = hr1.IP()
+    hr2_ip = hr2.IP()
+    
+    print hl1_ip
+    result = hl1.cmd('iperf -s -p 5001 -i 1 &')
+    print result
+    
+    print hr1_ip
+    result = hr1.cmd('iperf -c ' + hl1_ip + ' -t 1000 &')
+    print result
+
+    print hl2_ip
+    result = hl2.cmd('iperf -s -p 5002 -i 1 &')
+    print result
+
+    print hr2_ip
+    result = hr2.cmd('iperf -c ' + hl2_ip + ' -t 1000 &')
+    print result
+
     
     CLI(net)
     net.stop()
+
 
 if __name__ == '__main__':
     bbnet()
